@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>BRXQUEIROZ | CYBER PLATFORM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#020409;
+  --neon:#00f5d4;
+  --purple:#7c7cff;
+  --red:#ff3b3b;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+
+body{
+  background:radial-gradient(circle at top,#0b1225,var(--bg));
+  color:var(--text);
+  overflow-x:hidden;
+  transition:.5s;
+}
+
+canvas.bg{position:fixed;inset:0;z-index:-3}
+.scanlines{
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,.03),
+    rgba(255,255,255,.03) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events:none;
+  z-index:5;
+}
+
+.cursor{
+  position:fixed;
+  width:26px;height:26px;
+  border-radius:50%;
+  background:rgba(0,245,212,.45);
+  filter:blur(12px);
+  pointer-events:none;
+  z-index:999;
+}
+
+/* NAV */
+nav{
+  position:fixed;
+  top:0;width:100%;
+  padding:20px 60px;
+  display:flex;
+  justify-content:space-between;
+  backdrop-filter:blur(12px);
+  background:rgba(2,4,9,.8);
+  z-index:10;
+}
+
+nav h1{
+  font-weight:900;
+  background:linear-gradient(90deg,var(--neon),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+nav span{
+  font-size:.8rem;
+  color:var(--muted);
+}
+
+nav a{
+  margin-left:22px;
+  text-decoration:none;
+  font-size:.85rem;
+  color:var(--muted);
+}
+nav a:hover{color:var(--neon)}
+
+/* PAGES */
+.page{
+  min-height:100vh;
+  padding:140px 80px;
+  display:none;
+}
+.page.active{display:block}
+.container{max-width:1200px;margin:auto}
+
+/* GLITCH */
+.glitch{
+  font-size:4.8rem;
+  font-weight:900;
+  position:relative;
+}
+.glitch::before,
+.glitch::after{
+  content:attr(data-text);
+  position:absolute;left:0;width:100%;
+}
+.glitch::before{top:-2px;color:var(--neon);animation:g1 2s infinite}
+.glitch::after{top:2px;color:var(--purple);animation:g2 1.5s infinite}
+@keyframes g1{0%{clip-path:inset(10% 0 60% 0)}50%{clip-path:inset(40% 0 20% 0)}}
+@keyframes g2{0%{clip-path:inset(50% 0 10% 0)}50%{clip-path:inset(20% 0 40% 0)}}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+  margin-top:40px;
+}
+.card{
+  background:#01040a;
+  border:1px solid rgba(0,245,212,.35);
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 0 60px rgba(0,245,212,.25);
+  transition:.4s;
+}
+.card:hover{transform:translateY(-10px)}
+.card h3{color:var(--neon);margin-bottom:10px}
+
+/* TERMINAL */
+.terminal{
+  background:#000;
+  border:1px solid rgba(0,245,212,.4);
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 0 80px rgba(0,245,212,.4);
+}
+.output{max-height:320px;overflow-y:auto;font-family:monospace}
+.output p{color:var(--neon);margin-bottom:6px}
+.terminal input{
+  width:100%;
+  background:#000;
+  border:none;
+  color:var(--neon);
+  padding:10px;
+  font-family:monospace;
+}
+
+/* MAP */
+#map{
+  width:100%;
+  height:460px;
+  border-radius:16px;
+  border:1px solid rgba(0,245,212,.4);
+  background:#000;
+}
+
+/* INCIDENT */
+body.incident{
+  background:#140404;
+}
+body.incident nav{
+  background:rgba(20,4,4,.9);
+}
+body.incident .card{
+  border-color:rgba(255,59,59,.6);
+  box-shadow:0 0 80px rgba(255,59,59,.5);
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:40px;
+  font-size:.8rem;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<canvas class="bg" id="matrix"></canvas>
+<div class="scanlines"></div>
+<div class="cursor" id="cursor"></div>
+
+<nav>
+  <div>
+    <h1>BRX SYSTEM</h1>
+    <span id="level">Visitor</span>
+  </div>
+  <div>
+    <a onclick="go('home')">Home</a>
+    <a onclick="go('tech')">Tech</a>
+    <a onclick="go('architecture')">Architecture</a>
+    <a onclick="go('projects')">Projects</a>
+    <a onclick="go('terminal')">Terminal</a>
+    <a onclick="go('mapPage')">Map</a>
+  </div>
+</nav>
+
+<section id="home" class="page active">
+  <div class="container">
+    <div class="glitch" data-text="BrxQueiroz">BrxQueiroz</div>
+    <p style="margin-top:25px;color:var(--muted);max-width:760px">
+      Este sistema não foi criado para ser consumido passivamente.
+      Ele reage, memoriza, responde e evolui conforme interação.
+      É assim que sistemas reais funcionam.
+    </p>
+  </div>
+</section>
+
+<section id="tech" class="page">
+  <div class="container">
+    <h2 style="color:var(--neon)">Engineering & Security</h2>
+    <div class="grid">
+      <div class="card"><h3>Threat Modeling</h3><p>Análise de superfície de ataque e vetores reais</p></div>
+      <div class="card"><h3>Defense in Depth</h3><p>Camadas independentes e falha controlada</p></div>
+      <div class="card"><h3>Programming</h3><p>JavaScript • Estado • Sistemas reativos</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture" class="page">
+  <div class="container">
+    <h2 style="color:var(--neon)">Architecture Decisions</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Interface</h3>
+        <p>Nenhuma animação é decorativa.
+        Cada movimento indica estado do sistema.</p>
+      </div>
+      <div class="card">
+        <h3>Segurança</h3>
+        <p>Falhas são previstas, isoladas e monitoradas.</p>
+      </div>
+      <div class="card">
+        <h3>Controle</h3>
+        <p>O terminal governa o front-end.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects" class="page">
+  <div class="container">
+    <h2 style="color:var(--neon)">Projects</h2>
+    <div class="grid">
+      <div class="card"><h3>Cyber Platform</h3><p>Portfólio como sistema vivo</p></div>
+      <div class="card"><h3>Secure Dashboards</h3><p>Interfaces administrativas seguras</p></div>
+      <div class="card"><h3>Threat Map</h3><p>Visualização dinâmica de eventos</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="terminal" class="page">
+  <div class="container terminal">
+    <div class="output" id="out">
+      <p>> system online</p>
+      <p>> type help</p>
+    </div>
+    <input id="cmd" placeholder="command">
+  </div>
+</section>
+
+<section id="mapPage" class="page">
+  <div class="container">
+    <h2 style="color:var(--neon)">Global Threat Activity</h2>
+    <canvas id="map"></canvas>
+  </div>
+</section>
+
+<footer>© BrxQueiroz — Cybersecurity & Systems Engineering</footer>
+
+<script>
+// STATE & MEMORY
+const STATE = JSON.parse(localStorage.getItem("BRX_STATE")) || {
+  visits:0, level:0, commands:0
+};
+const levels=["Visitor","Explorer","Analyst","Architect"];
+STATE.visits++;
+
+// SOUND
+const ctx=new AudioContext();
+function beep(f=600){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=f;o.connect(g);g.connect(ctx.destination);
+  o.start();g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.15);
+  o.stop(ctx.currentTime+.15);
+}
+
+// NAV
+function go(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  beep(800);
+}
+
+// CURSOR
+const cur=document.getElementById("cursor");
+addEventListener("mousemove",e=>{
+  cur.style.left=e.clientX+"px";
+  cur.style.top=e.clientY+"px";
+});
+
+// MATRIX
+const c=document.getElementById("matrix"),x=c.getContext("2d");
+c.width=innerWidth;c.height=innerHeight;
+const letters="01",s=14,cols=c.width/s,drops=Array(cols).fill(1);
+setInterval(()=>{
+  x.fillStyle="rgba(2,4,9,.08)";
+  x.fillRect(0,0,c.width,c.height);
+  x.fillStyle="#00f5d4";
+  x.font=s+"px monospace";
+  drops.forEach((y,i)=>{
+    x.fillText(letters[Math.random()*2|0],i*s,y*s);
+    if(y*s>c.height&&Math.random()>.98)drops[i]=0;
+    drops[i]++;
+  });
+},35);
+
+// TERMINAL
+const cmd=document.getElementById("cmd");
+const out=document.getElementById("out");
+
+function log(t){out.innerHTML+=`<p>> ${t}</p>`;out.scrollTop=out.scrollHeight;beep(500)}
+
+cmd.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){exec(cmd.value.trim());cmd.value=""}
+});
+
+function exec(v){
+  STATE.commands++;
+  log(v);
+  if(STATE.commands>5&&STATE.level<1)STATE.level=1;
+  if(STATE.commands>12&&STATE.level<2)STATE.level=2;
+  if(STATE.commands>20&&STATE.level<3)STATE.level=3;
+  document.getElementById("level").innerText=levels[STATE.level];
+
+  switch(v){
+    case "help":
+      log("scan status whoami expert incident recruiter clear");
+      break;
+    case "scan": log("environment secure"); break;
+    case "status": log(`visits:${STATE.visits} cmds:${STATE.commands}`); break;
+    case "whoami": log("brxqueiroz :: cyber architect"); break;
+    case "incident":
+      document.body.classList.toggle("incident");
+      log("incident mode toggled");
+      break;
+    case "recruiter":
+      document.body.style.filter="grayscale(1)";
+      log("recruiter view enabled");
+      break;
+    case "clear": out.innerHTML=""; break;
+    default: log("unknown command");
+  }
+
+  localStorage.setItem("BRX_STATE",JSON.stringify(STATE));
+}
+
+// MAP
+const map=document.getElementById("map"),mx=map.getContext("2d");
+map.width=map.offsetWidth;map.height=map.offsetHeight;
+setInterval(()=>{
+  mx.fillStyle="rgba(0,0,0,.18)";
+  mx.fillRect(0,0,map.width,map.height);
+  mx.beginPath();
+  mx.arc(Math.random()*map.width,Math.random()*map.height,4,0,Math.PI*2);
+  mx.fillStyle=STATE.level>=2?"#ff3b3b":"#00f5d4";
+  mx.fill();
+},500);
+</script>
+
+</body>
+</html>
